@@ -1,0 +1,5 @@
+export const PaymentMethod = {
+    EFECTIVO: "EFECTIVO",
+    MERCADO_PAGO: "MERCADO_PAGO",
+    CRIPTOMONEDA: "CRIPTOMONEDA"
+}
