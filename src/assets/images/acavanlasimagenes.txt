@@ -1,0 +1,2 @@
+o sea no aca en el txt sino en la carpeta obvio pero tenia que crear el txt para que se suban las carpetas al git en fin
+saludos cuidense mucho
