@@ -4,9 +4,14 @@ import express from "express";
 import {InvoiceRoutes} from "./routes/InvoiceRoutes.js";
 import {UserRoutes} from "./routes/UserRoutes.js";
 import {ProductRoutes} from "./routes/ProductRoutes.js";
+import cors from "cors"
 
 
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+}));
 app.use(express.json());
 app.use("/invoice", InvoiceRoutes())
 app.use("/user", UserRoutes())

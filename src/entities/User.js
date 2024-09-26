@@ -19,9 +19,11 @@ export const User = new EntitySchema({
             type: "int"
         },
         is_admin: {
-            type: "boolean"
+            type: "boolean",
+            default: false
         },
         is_blocked: {
+            default: false,
             type: "boolean"
         },
         email: {
