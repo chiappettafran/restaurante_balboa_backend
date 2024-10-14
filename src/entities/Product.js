@@ -36,6 +36,12 @@ export const Product = new EntitySchema({
             type: "one-to-many",
             target: "Invoice_Detail",
             inverseSide: "product"
+        },
+        category: {
+            type: "many-to-one",
+            target: "Category",
+            inverseSide: "products",
+            nullable: true
         }
     }
 })

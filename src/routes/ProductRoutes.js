@@ -21,13 +21,25 @@ export const ProductRoutes = () => {
 
     router.get("/find/:id", async (req, res) => {
         const {id} = req.params;
-        const products = await productRepository.findOne({
+        const product = await productRepository.findOne({
             where: {id, is_deleted: false}
+        });
+        if (products) {
+            res.json(product);
+        } else {
+            res.status(404).json({error: "Product not found"});
+        }
+    })
+
+    router.get("/findByCategory/:categoryId", async (req, res) => {
+        const {id} = req.params;
+        const products = await productRepository.find({
+            where: {categoryId: id, is_deleted: false}
         });
         if (products) {
             res.json(products);
         } else {
-            res.status(404).json({error: "Product not found"});
+            res.status(404).json({error: "Products not found"});
         }
     })
 
