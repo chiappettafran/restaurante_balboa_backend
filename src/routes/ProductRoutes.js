@@ -14,7 +14,8 @@ export const ProductRoutes = () => {
 
     router.get("/find/all", async (req, res) => {
         const products = await productRepository.find({
-            where: {is_deleted: false}
+            where: {is_deleted: false},
+            relations: ["category"]
         });
         res.json(products);
     })
@@ -22,7 +23,8 @@ export const ProductRoutes = () => {
     router.get("/find/:id", async (req, res) => {
         const {id} = req.params;
         const product = await productRepository.findOne({
-            where: {id, is_deleted: false}
+            where: {id, is_deleted: false},
+            relations: ["category"]
         });
         if (products) {
             res.json(product);
@@ -34,7 +36,8 @@ export const ProductRoutes = () => {
     router.get("/findByCategory/:categoryId", async (req, res) => {
         const {id} = req.params;
         const products = await productRepository.find({
-            where: {categoryId: id, is_deleted: false}
+            where: {categoryId: id, is_deleted: false},
+            relations: ["category"]
         });
         if (products) {
             res.json(products);
