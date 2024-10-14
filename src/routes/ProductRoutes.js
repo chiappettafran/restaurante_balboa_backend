@@ -1,13 +1,27 @@
-import { Router } from "express";
+import {Router} from "express";
 import {AppDataSource} from "../data_source.js";
 import {Product} from "../entities/Product.js";
+import {upload} from "../index.js";
+import {Category} from "../entities/Category.js";
 
 export const ProductRoutes = () => {
     const router = Router();
     const productRepository = AppDataSource.getRepository(Product)
+    const categoryRepository = AppDataSource.getRepository(Category)
 
-    router.post("/create", async (req, res) => {
+    router.post("/create",upload.single('image'), async (req, res) => {
+        const imageFile = req.file;
         const product = productRepository.create(req.body);
+
+        product.category = await categoryRepository.findOne({
+            where: {id: req.body.categoryId}
+            }
+        )
+
+        if (imageFile) {
+            product.image_url = `${req.protocol}://${req.get('host')}/uploads/${imageFile.filename}`;
+        }
+
         await productRepository.save(product);
         res.status(201).json(product);
     })
@@ -46,8 +60,12 @@ export const ProductRoutes = () => {
         }
     })
 
-    router.put("/update/:id", async (req, res) => {
+    router.put("/update/:id",upload.single('image'), async (req, res) => {
         const {id} = req.params;
+        const imageFile = req.file;
+        if (imageFile) {
+            req.body.image_url = `${req.protocol}://${req.get('host')}/uploads/${imageFile.filename}`;
+        }
         await productRepository.update(id, req.body);
         const updatedProduct = await productRepository.findOne({
             where: {id, is_deleted: false}

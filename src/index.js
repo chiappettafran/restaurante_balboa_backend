@@ -4,10 +4,36 @@ import express from "express";
 import {InvoiceRoutes} from "./routes/InvoiceRoutes.js";
 import {UserRoutes} from "./routes/UserRoutes.js";
 import {ProductRoutes} from "./routes/ProductRoutes.js";
+import { fileURLToPath } from 'url';
 import cors from "cors"
+import multer from 'multer'
+import path from 'path'
+import fs from 'fs'
 
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = path.join(__dirname, 'uploads');
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase();
+        const fileName = `${req.body.name}${ext}`;
+        cb(null, fileName);
+    },
+});
+
+export const upload = multer({ storage });
+
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
