@@ -49,8 +49,12 @@ export const ProductRoutes = () => {
 
     router.get("/findByCategory/:categoryId", async (req, res) => {
         const {id} = req.params;
+        const category = await categoryRepository.findOne({
+                where: {id: id}
+            }
+        )
         const products = await productRepository.find({
-            where: {categoryId: id, is_deleted: false},
+            where: {category: category, is_deleted: false},
             relations: ["category"]
         });
         if (products) {
@@ -66,6 +70,13 @@ export const ProductRoutes = () => {
         if (imageFile) {
             req.body.image_url = `${req.protocol}://${req.get('host')}/uploads/${imageFile.filename}`;
         }
+
+        req.body.category = await categoryRepository.findOne({
+                where: {id: req.body.categoryId}
+            }
+        )
+        delete req.body.categoryId
+
         await productRepository.update(id, req.body);
         const updatedProduct = await productRepository.findOne({
             where: {id, is_deleted: false}
