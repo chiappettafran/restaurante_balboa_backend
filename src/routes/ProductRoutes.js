@@ -53,12 +53,29 @@ export const ProductRoutes = () => {
                 where: {id: id}
             }
         )
+        console.log(`Encontré la categoria: ${category}`)
         const products = await productRepository.find({
             where: {category: category, is_deleted: false},
             relations: ["category"]
         });
         if (products) {
             res.json(products);
+        } else {
+            res.status(404).json({error: "Products not found"});
+        }
+    })
+
+    router.get("/fetchByCategory", async (req, res) => {
+        const productsByCategory = await categoryRepository.find({
+            where: {is_deleted: false},
+            relations: ["products"],
+        })
+        if (productsByCategory) {
+            const productsByCategoryFiltered = productsByCategory.map(category => ({
+                ...category,
+                products: category.products.filter(product => !product.is_deleted),
+            }));
+            res.json(productsByCategoryFiltered);
         } else {
             res.status(404).json({error: "Products not found"});
         }
