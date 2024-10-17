@@ -1,4 +1,5 @@
-import { EntitySchema } from "typeorm"
+
+import { EntitySchema } from "typeorm";
 
 export const Product = new EntitySchema({
     name: "Product",
@@ -30,7 +31,6 @@ export const Product = new EntitySchema({
             default: false,
         }
     },
-
     relations: {
         sales: {
             type: "one-to-many",
@@ -44,4 +44,4 @@ export const Product = new EntitySchema({
             nullable: true
         }
     }
-})
+});
