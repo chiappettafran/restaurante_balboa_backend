@@ -8,7 +8,7 @@ import {Category} from "./entities/Category.js";
 
 export const AppDataSource = new DataSource({
     type: "better-sqlite3",
-    database: "D:\\Documentos\\UTN\\Tecnicatura en Programación\\3º Semestre\\Laboratorio de Computacion III\\restaurante_balboa_backend\\database\\basePrueba.db",
+    database: "./database/basePrueba.db",
     username: "java_script",
     password: "frontend",
     synchronize: true,

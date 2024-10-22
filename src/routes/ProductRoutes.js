@@ -19,7 +19,7 @@ export const ProductRoutes = () => {
         )
 
         if (imageFile) {
-            product.image_url = `${req.protocol}://${req.get('host')}/uploads/${imageFile.filename}`;
+            product.image_url = `uploads/${imageFile.filename}`;
         }
 
         await productRepository.save(product);
@@ -85,7 +85,7 @@ export const ProductRoutes = () => {
         const {id} = req.params;
         const imageFile = req.file;
         if (imageFile) {
-            req.body.image_url = `${req.protocol}://${req.get('host')}/uploads/${imageFile.filename}`;
+            req.body.image_url = `uploads/${imageFile.filename}`;
         }
 
         req.body.category = await categoryRepository.findOne({
