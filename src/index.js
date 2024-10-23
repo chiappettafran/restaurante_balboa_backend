@@ -53,7 +53,7 @@ AppDataSource.initialize().then(() => {
     const PROTOCOL = process.env.PROTOCOL || 'http';
 
     app.listen(PORT, HOST, () => {
-        console.log(`Servidor escuchando en ${PROTOCOL}://${HOST}:${PORT}`);
+        console.log(`Servidor escuchando en el puerto: ${PORT}`);
     });
 
 }).catch((error) => console.log("Error al conectar a la base de datos:", error))
