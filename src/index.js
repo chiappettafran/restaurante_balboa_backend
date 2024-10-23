@@ -49,10 +49,7 @@ AppDataSource.initialize().then(() => {
     console.log("Conexión Establecida")
 
     const PORT = process.env.PORT || 3001;
-    const HOST = process.env.HOST || 'localhost';
-    const PROTOCOL = process.env.PROTOCOL || 'http';
-
-    app.listen(PORT, HOST, () => {
+    app.listen(PORT, () => {
         console.log(`Servidor escuchando en el puerto: ${PORT}`);
     });
 
