@@ -5,6 +5,7 @@ import {InvoiceRoutes} from "./routes/InvoiceRoutes.js";
 import {UserRoutes} from "./routes/UserRoutes.js";
 import {ProductRoutes} from "./routes/ProductRoutes.js";
 import { fileURLToPath } from 'url';
+import dotenv from "dotenv";
 import cors from "cors"
 import multer from 'multer'
 import path from 'path'
@@ -12,6 +13,7 @@ import fs from 'fs'
 
 
 const app = express();
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,7 +37,7 @@ const storage = multer.diskStorage({
 export const upload = multer({ storage });
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONT_HOST,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 }));
 app.use(express.json());
@@ -46,8 +48,10 @@ app.use("/product", ProductRoutes())
 AppDataSource.initialize().then(() => {
     console.log("Conexión Establecida")
 
-    app.listen(3001, () => {
-        console.log("Servidor escuchando en http://localhost:3001")
-    })
+    const PORT = process.env.PORT || 3001;
+    app.listen(PORT, () => {
+        console.log(`Servidor escuchando en el puerto: ${PORT}`);
+    });
+
 }).catch((error) => console.log("Error al conectar a la base de datos:", error))
 
