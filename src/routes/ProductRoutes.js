@@ -40,7 +40,7 @@ export const ProductRoutes = () => {
             where: {id, is_deleted: false},
             relations: ["category"]
         });
-        if (products) {
+        if (product) {
             res.json(product);
         } else {
             res.status(404).json({error: "Product not found"});
