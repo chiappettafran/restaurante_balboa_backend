@@ -12,6 +12,6 @@ export const AppDataSource = new DataSource({
     username: "java_script",
     password: "frontend",
     synchronize: true,
-    logging: false,
+    logging: true,
     entities: [User, Invoice, Invoice_Detail, Product, Category]
 })

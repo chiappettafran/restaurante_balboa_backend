@@ -1,16 +1,40 @@
-import { Router } from "express";
+import {Router} from "express";
 import {AppDataSource} from "../data_source.js";
 import {Invoice} from "../entities/Invoice.js";
 import {Invoice_Detail} from "../entities/Invoice_Detail.js";
+import {upload} from "../index.js";
 
 export const InvoiceRoutes = () => {
     const router = Router();
     const invoiceRepository = AppDataSource.getRepository(Invoice)
+    const invoiceDetailRepository = AppDataSource.getRepository(Invoice_Detail)
 
-    router.post("/create", async (req, res) => {
-        const invoice = invoiceRepository.create(req.body);
-        await invoiceRepository.save(invoice);
-        res.status(201).json(invoice);
+    router.post("/create", upload.single('file'), async (req, res) => {
+        const payment_proof_file = req.file
+        try {
+            let { invoice_detail, ...invoiceData } = req.body;
+            const invoice = invoiceRepository.create(invoiceData);
+            invoice_detail = invoice_detail ? JSON.parse(invoice_detail) : [];
+
+            if (payment_proof_file) {
+                invoice.payment_proof_filePath = `uploads/${payment_proof_file.filename}`
+            }
+
+            if (invoice_detail && Array.isArray(invoice_detail)) {
+                invoice.invoice_detail = invoice_detail.map(detail => {
+                    return invoiceDetailRepository.create({
+                        quantity: detail.quantity,
+                        product: {id: detail.product},
+                    });
+                })
+            }
+            await invoiceRepository.save(invoice);
+            res.status(201).json(invoice);
+
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ error: 'Error al crear la factura' });
+        }
     })
 
     router.get("/find/all", async (req, res) => {

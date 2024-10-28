@@ -11,9 +11,6 @@ export const Invoice_Detail = new EntitySchema({
         quantity: {
             type: "int"
         },
-        amount: {
-            type: "float"
-        },
         is_deleted: {
             type: "boolean",
             default: false,

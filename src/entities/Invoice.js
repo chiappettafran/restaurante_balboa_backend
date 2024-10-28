@@ -9,13 +9,21 @@ export const Invoice = new EntitySchema({
             generated: true
         },
         date: {
-            type: "datetime"
+            type: String
         },
         total_amount: {
             type: "float"
         },
         payment_method: {
             type: String
+        },
+        is_payment_confirmed: {
+            type: "boolean",
+            default: false
+        },
+        payment_proof_filePath: {
+            type: String,
+            default: ""
         },
         is_deleted: {
             type: "boolean",
