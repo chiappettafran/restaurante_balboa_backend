@@ -25,6 +25,10 @@ export const Product = new EntitySchema({
             type: "varchar",
             nullable: true
         },
+        existences: {
+            type: "int",
+            default: 0
+        },
         is_deleted: {
             type: "boolean",
             default: false,

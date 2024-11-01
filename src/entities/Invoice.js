@@ -12,7 +12,7 @@ export const Invoice = new EntitySchema({
             type: String
         },
         total_amount: {
-            type: "float"
+            type: "real"
         },
         payment_method: {
             type: String
