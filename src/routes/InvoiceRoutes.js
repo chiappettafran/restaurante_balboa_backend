@@ -48,6 +48,7 @@ export const InvoiceRoutes = () => {
         } catch (e) {
             console.error(e);
             res.status(500).json({ error: 'Error al crear la factura' });
+
         }
     })
 
