@@ -37,8 +37,10 @@ export const InvoiceRoutes = () => {
                     for (const detail of invoice_detail) {
                         cost += await addRemoveStock(detail.product, -detail.quantity)
                     }
-                    await registerTransaction("stock", "withdrawal", cost, "Venta")
-                    await registerTransaction(invoice.payment_method, "deposit", invoice.total_amount, "Venta")
+                    await registerTransaction("stock", "withdrawal", cost, "por venta")
+                    await registerTransaction("cmv", "deposit", cost, "a Stock")
+                    await registerTransaction(invoice.payment_method, "deposit", invoice.total_amount, `a Ventas por ${invoice.payment_method}`)
+                    await registerTransaction(`sales${invoice.payment_method}`, "withdrawal", -invoice.total_amount, "Venta")
                 }
             )
             res.status(201).json(invoice);

@@ -9,7 +9,11 @@ export const ActiveAccount = new EntitySchema({
             generated: true,
         },
         name: {
-            type: "varchar",
+            type: String,
+        },
+        type: {
+            type: String,
+            default: "active"
         },
         balance: {
             type: "real",
