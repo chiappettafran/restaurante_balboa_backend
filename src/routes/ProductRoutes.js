@@ -3,6 +3,7 @@ import {AppDataSource} from "../data_source.js";
 import {Product} from "../entities/Product.js";
 import {upload} from "../index.js";
 import {Category} from "../entities/Category.js";
+import {addRemoveStock} from "../utilities/ProductFunctions.js";
 
 export const ProductRoutes = () => {
     const router = Router();
@@ -109,6 +110,17 @@ export const ProductRoutes = () => {
             res.status(204).send('soft deleted product');
         } else {
             res.status(404).json({error: "product not found"});
+        }
+    })
+
+    router.put("/addExistences/:id", async (req, res) => {
+        try {
+            const {id} = req.params;
+            const medioPago = req.body.paymentMethod
+            await addRemoveStock(id, req.body.modifier, medioPago, "Compra de mercadería")
+        } catch (e) {
+            console.log(e)
+            res.status(404).send("Error al actualizar el stock: " + e)
         }
     })
 

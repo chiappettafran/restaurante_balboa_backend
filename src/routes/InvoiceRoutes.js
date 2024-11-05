@@ -3,6 +3,8 @@ import {AppDataSource} from "../data_source.js";
 import {Invoice} from "../entities/Invoice.js";
 import {Invoice_Detail} from "../entities/Invoice_Detail.js";
 import {upload} from "../index.js";
+import {addRemoveStock} from "../utilities/ProductFunctions.js";
+import {registerTransaction} from "../utilities/TransactionFunctions.js";
 
 export const InvoiceRoutes = () => {
     const router = Router();
@@ -13,7 +15,7 @@ export const InvoiceRoutes = () => {
         const payment_proof_file = req.file
         try {
             let { invoice_detail, ...invoiceData } = req.body;
-            const invoice = invoiceRepository.create(invoiceData);
+            const invoice = invoiceRepository.create(invoiceData)
             invoice_detail = invoice_detail ? JSON.parse(invoice_detail) : [];
 
             if (payment_proof_file) {
@@ -28,7 +30,17 @@ export const InvoiceRoutes = () => {
                     });
                 })
             }
-            await invoiceRepository.save(invoice);
+
+            await AppDataSource.transaction(async () => {
+                    await invoiceRepository.save(invoice);
+                    let cost = 0
+                    for (const detail of invoice_detail) {
+                        cost += await addRemoveStock(detail.product, -detail.quantity)
+                    }
+                    await registerTransaction("stock", "withdrawal", cost, "Venta")
+                    await registerTransaction(invoice.payment_method, "deposit", invoice.total_amount, "Venta")
+                }
+            )
             res.status(201).json(invoice);
 
         } catch (e) {

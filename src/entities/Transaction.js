@@ -10,13 +10,16 @@ export const Transaction = new EntitySchema({
             generated: true,
         },
         type: {
-            type: "varchar", // Tipo de transacción: "deposit", "withdrawal", "purchase"
+            type: String, // Tipo de transacción: "deposit", "withdrawal", "purchase"
         },
         amount: {
             type: "real",
         },
         date: {
-            type: "varchar",
+            type: String,
+        },
+        detail: {
+            type: String,
         },
     },
     relations: {

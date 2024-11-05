@@ -1,11 +1,12 @@
 import {createConnection, getConnection} from "typeorm";
 import {Transaction} from "../entities/Transaction.js";
 import {ActiveAccount} from "../entities/ActiveAccount.js";
+import {AppDataSource} from "../data_source.js";
 
-async function registerTransaction(accountName, type, amount) {
-    const connection = getConnection();
-    const accountRepository = connection.getRepository(ActiveAccount);
-    const transactionRepository = connection.getRepository(Transaction);
+export async function registerTransaction(accountName, type, amount, detail) {
+
+    const accountRepository = AppDataSource.getRepository(ActiveAccount);
+    const transactionRepository = AppDataSource.getRepository(Transaction);
 
     const account = await accountRepository.findOne({ where: { name: accountName } });
 
@@ -19,12 +20,15 @@ async function registerTransaction(accountName, type, amount) {
 
         // Guardar los cambios en la cuenta
         await accountRepository.save(account);
+        const today = new Date().toISOString();
 
         // Crear la transacción y guardarla
         const transaction = transactionRepository.create({
             type,
             amount,
             account,
+            date: today,
+            detail,// Cambia 'today' a 'date' para que coincida con el esquema
         });
 
         await transactionRepository.save(transaction);
