@@ -21,6 +21,10 @@ export const Transaction = new EntitySchema({
         detail: {
             type: String,
         },
+        super_detail: {
+            type: String,
+            default: '',
+        },
         is_deleted: {
             type: "boolean",
             default: false,
@@ -30,8 +34,8 @@ export const Transaction = new EntitySchema({
         account: {
             type: "many-to-one",
             target: "ActiveAccount",
+            inverseSide: "transactions",
             joinColumn: true,
-            cascade: true,
         },
     },
 });

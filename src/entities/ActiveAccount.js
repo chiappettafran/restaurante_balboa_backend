@@ -23,6 +23,12 @@ export const ActiveAccount = new EntitySchema({
             type: "boolean",
             default: false,
         },
-
     },
+    relations: {
+        transactions: {
+            type: "one-to-many",
+            target: "Transaction",
+            inverseSide: "account",
+        }
+    }
 });

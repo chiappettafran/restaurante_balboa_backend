@@ -3,7 +3,7 @@ import {Transaction} from "../entities/Transaction.js";
 import {ActiveAccount} from "../entities/ActiveAccount.js";
 import {AppDataSource} from "../data_source.js";
 
-export async function registerTransaction(accountName, type, amount, detail) {
+export async function registerTransaction(accountName, type, amount, detail, super_detail) {
 
     const accountRepository = AppDataSource.getRepository(ActiveAccount);
     const transactionRepository = AppDataSource.getRepository(Transaction);
@@ -34,6 +34,7 @@ export async function registerTransaction(accountName, type, amount, detail) {
             account,
             date: today,
             detail,
+            super_detail: super_detail ? super_detail : ''
         });
 
         await transactionRepository.save(transaction);
