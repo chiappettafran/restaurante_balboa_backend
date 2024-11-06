@@ -21,6 +21,10 @@ export const Transaction = new EntitySchema({
         detail: {
             type: String,
         },
+        is_deleted: {
+            type: "boolean",
+            default: false,
+        },
     },
     relations: {
         account: {

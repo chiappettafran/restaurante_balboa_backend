@@ -12,8 +12,8 @@ export const addRemoveStock = async (productId, stockModifier, paymentMethod, de
         product.existences = product.existences + stockModifier
 
         if (stockModifier > 0) {
-            await registerTransaction(paymentMethod, "withdrawal", product.cost*stockModifier, detail)
-            await registerTransaction("stock", "deposit", product.cost*stockModifier, detail)
+            await registerTransaction(paymentMethod, "withdrawal", product.cost*stockModifier, "Compra de mercaderia")
+            await registerTransaction("stock", "deposit", product.cost*stockModifier, "a mercadoPago")
         }
 
         await productRepository.save(product)

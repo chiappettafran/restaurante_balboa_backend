@@ -19,5 +19,10 @@ export const ActiveAccount = new EntitySchema({
             type: "real",
             default: 0,
         },
+        is_deleted: {
+            type: "boolean",
+            default: false,
+        },
+
     },
 });

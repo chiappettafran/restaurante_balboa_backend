@@ -13,7 +13,8 @@ export async function registerTransaction(accountName, type, amount, detail) {
     if (account) {
         // Actualizar el saldo de la cuenta según el tipo de transacción
         if (type === "deposit") {
-            account.balance += amount;
+            let aux = account.balance
+            account.balance = Number(aux) + Number(amount)
         } else if (type === "withdrawal" || type === "purchase") {
             account.balance -= amount;
         }
@@ -23,12 +24,16 @@ export async function registerTransaction(accountName, type, amount, detail) {
         const today = new Date().toISOString();
 
         // Crear la transacción y guardarla
+        if (amount < 0) {
+            amount = amount*-1
+        }
+
         const transaction = transactionRepository.create({
             type,
             amount,
             account,
             date: today,
-            detail,// Cambia 'today' a 'date' para que coincida con el esquema
+            detail,
         });
 
         await transactionRepository.save(transaction);

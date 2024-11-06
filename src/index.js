@@ -10,6 +10,7 @@ import cors from "cors"
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
+import {AccountingRoutes} from "./routes/AccountingRoutes.js";
 
 
 const app = express();
@@ -44,6 +45,7 @@ app.use(express.json());
 app.use("/invoice", InvoiceRoutes())
 app.use("/user", UserRoutes())
 app.use("/product", ProductRoutes())
+app.use("/accounting", AccountingRoutes())
 
 AppDataSource.initialize().then(() => {
     console.log("Conexión Establecida")
