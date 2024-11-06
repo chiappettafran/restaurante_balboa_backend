@@ -4,16 +4,14 @@ import { User } from "./entities/User.js";
 import { Invoice } from "./entities/Invoice.js";
 import { Invoice_Detail } from "./entities/Invoice_Detail.js";
 import { Product } from "./entities/Product.js";
-import { Category } from "./entities/Category.js";
-import {ActiveAccount} from "./entities/ActiveAccount.js";
-import {Transaction} from "./entities/Transaction.js";
+import {Category} from "./entities/Category.js";
 
 export const AppDataSource = new DataSource({
     type: "better-sqlite3",
-    database: "./database/basePrueba.db",
+    database: "C:\\Users\\Aaron\\WebstormProjects\\restaurante_balboa_backend\\database\\basePrueba.db",
     username: "java_script",
     password: "frontend",
     synchronize: true,
-    logging: true,
-    entities: [User, Invoice, Invoice_Detail, Product, Category, ActiveAccount, Transaction]
+    logging: false,
+    entities: [User, Invoice, Invoice_Detail, Product, Category]
 })

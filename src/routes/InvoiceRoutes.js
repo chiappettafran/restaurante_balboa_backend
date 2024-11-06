@@ -1,65 +1,66 @@
-import {Router} from "express";
-import {AppDataSource} from "../data_source.js";
-import {Invoice} from "../entities/Invoice.js";
-import {Invoice_Detail} from "../entities/Invoice_Detail.js";
-import {upload} from "../index.js";
-import {addRemoveStock} from "../utilities/ProductFunctions.js";
-import {registerTransaction} from "../utilities/TransactionFunctions.js";
+import { Router } from "express";
+import { AppDataSource } from "../data_source.js";
+import { Invoice } from "../entities/Invoice.js";
+import { Invoice_Detail } from "../entities/Invoice_Detail.js";
+import { upload } from "../index.js";
+import { addRemoveStock } from "../utilities/ProductFunctions.js";
+import { registerTransaction } from "../utilities/TransactionFunctions.js";
 
 export const InvoiceRoutes = () => {
     const router = Router();
-    const invoiceRepository = AppDataSource.getRepository(Invoice)
-    const invoiceDetailRepository = AppDataSource.getRepository(Invoice_Detail)
+    const invoiceRepository = AppDataSource.getRepository(Invoice);
+    const invoiceDetailRepository = AppDataSource.getRepository(Invoice_Detail);
 
+    // Ruta para crear una nueva factura
     router.post("/create", upload.single('file'), async (req, res) => {
-        const payment_proof_file = req.file
+        const payment_proof_file = req.file;
         try {
             let { invoice_detail, ...invoiceData } = req.body;
-            const invoice = invoiceRepository.create(invoiceData)
+            const invoice = invoiceRepository.create(invoiceData);
             invoice_detail = invoice_detail ? JSON.parse(invoice_detail) : [];
 
             if (payment_proof_file) {
-                invoice.payment_proof_filePath = `uploads/${payment_proof_file.filename}`
+                invoice.payment_proof_filePath = `uploads/${payment_proof_file.filename}`;
             }
 
             if (invoice_detail && Array.isArray(invoice_detail)) {
                 invoice.invoice_detail = invoice_detail.map(detail => {
                     return invoiceDetailRepository.create({
                         quantity: detail.quantity,
-                        product: {id: detail.product},
+                        product: { id: detail.product },
                     });
-                })
+                });
             }
 
             await AppDataSource.transaction(async () => {
-                    await invoiceRepository.save(invoice);
-                    let cost = 0
-                    for (const detail of invoice_detail) {
-                        cost += await addRemoveStock(detail.product, -detail.quantity)
-                    }
-                    await registerTransaction("stock", "withdrawal", cost, "por venta")
-                    await registerTransaction("cmv", "deposit", cost, "a Stock", "Venta")
-                    await registerTransaction(invoice.payment_method, "deposit", invoice.total_amount, `a Ventas por ${invoice.payment_method}`, "Venta")
-                    await registerTransaction(`sales${invoice.payment_method}`, "withdrawal", -invoice.total_amount, "Venta")
+                await invoiceRepository.save(invoice);
+                let cost = 0;
+                for (const detail of invoice_detail) {
+                    cost += await addRemoveStock(detail.product, -detail.quantity);
                 }
-            )
-            res.status(201).json(invoice);
+                await registerTransaction("stock", "withdrawal", cost, "por venta");
+                await registerTransaction("cmv", "deposit", cost, "a Stock", "Venta");
+                await registerTransaction(invoice.payment_method, "deposit", invoice.total_amount, `a Ventas por ${invoice.payment_method}`, "Venta");
+                await registerTransaction(`sales${invoice.payment_method}`, "withdrawal", -invoice.total_amount, "Venta");
+            });
 
+            res.status(201).json(invoice);
         } catch (e) {
             console.error(e);
             res.status(500).json({ error: 'Error al crear la factura' });
-
         }
-    })
+    });
 
+    // Ruta para obtener todas las facturas
     router.get("/find/all", async (req, res) => {
         const invoices = await invoiceRepository.find({
-            where: {is_deleted: false},
+            where: { is_deleted: false },
             relations: ["invoice_detail"]
         });
         res.json(invoices);
-    })
+    });
 
+    // Ruta para obtener una factura por ID
     router.get("/find/:id", async (req, res) => {
         const { id } = req.params;
         const invoice = await invoiceRepository.findOne({
@@ -71,8 +72,9 @@ export const InvoiceRoutes = () => {
         } else {
             res.status(404).json({ error: "Invoice not found" });
         }
-    })
+    });
 
+    // Ruta para actualizar una factura
     router.put("/update/:id", async (req, res) => {
         const { id } = req.params;
         await invoiceRepository.update(id, req.body);
@@ -81,8 +83,9 @@ export const InvoiceRoutes = () => {
             relations: ["invoice_detail"]
         });
         res.json(updatedInvoice);
-    })
+    });
 
+    // Ruta para eliminar (soft delete) una factura
     router.patch("/delete/:id", async (req, res) => {
         const { id } = req.params;
         const result = await invoiceRepository.update(id, { is_deleted: true });
@@ -94,8 +97,25 @@ export const InvoiceRoutes = () => {
         } else {
             res.status(404).json({ error: "Invoice not found" });
         }
-    })
+    });
 
-    return router
+    // Ruta para obtener las ventas pendientes
+    router.get("/pendingSales", async (req, res) => {
+        try {
+            // Filtrar las facturas con estado "is_payment_confirmed" como false (o el campo correspondiente)
+            const pendingSales = await AppDataSource.getRepository(Invoice)
+                .find({
+                    where: { is_payment_confirmed: false, is_deleted: false }, // Asegúrate de que este filtro coincida con tu esquema
+                    relations: ["invoice_detail", "user"], // Incluye las relaciones necesarias
+                });
 
-}
+            // Devolver las ventas pendientes
+            res.json(pendingSales);
+        } catch (err) {
+            console.error("Error al obtener las ventas pendientes", err);
+            res.status(500).json({ error: "Error al obtener las ventas pendientes" });
+        }
+    });
+
+    return router;
+};

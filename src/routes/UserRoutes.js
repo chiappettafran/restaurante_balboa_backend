@@ -88,13 +88,3 @@ export const UserRoutes = () => {
     })
     return router
 }
-
-
-
-
-
-
-
-
-
-
