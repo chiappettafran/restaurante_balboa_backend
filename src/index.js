@@ -11,6 +11,7 @@ import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
 import {AccountingRoutes} from "./routes/AccountingRoutes.js";
+import { MercadoPago } from "./routes/MercadoPago.js";
 
 
 const app = express();
@@ -46,6 +47,7 @@ app.use("/invoice", InvoiceRoutes())
 app.use("/user", UserRoutes())
 app.use("/product", ProductRoutes())
 app.use("/accounting", AccountingRoutes())
+app.use("/mercadoPago", MercadoPago())
 
 AppDataSource.initialize().then(() => {
     console.log("Conexión Establecida")
