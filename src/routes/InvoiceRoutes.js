@@ -143,15 +143,12 @@ export const InvoiceRoutes = () => {
             const pendingInvoices = await invoiceRepository.find({
                 where: {
                     is_deleted: false,
-                    is_payment_confirmed: false, // Solo facturas no confirmadas
-                },
-                relations: ["client"],
-                select: ['id', 'date', 'total_amount', 'payment_method', 'client']
+                    is_payment_confirmed: false
+                }
             });
             res.json(pendingInvoices);
         } catch (error) {
-            console.log("Error al obtener las facturas pendientes:", error);
-            res.status(500).json({ error: "Error al obtener las facturas pendientes" });
+            res.status(500).json({ error: "Error fetching pending invoices" });
         }
     });
 
