@@ -138,7 +138,7 @@ export const InvoiceRoutes = () => {
     });
 
     // Ruta para obtener las facturas pendientes (no pagadas)
-    router.get("/find/pending", async (req, res) => {
+    router.get("/findPending", async (req, res) => {
         try {
             const pendingInvoices = await invoiceRepository.find({
                 where: {
@@ -153,7 +153,7 @@ export const InvoiceRoutes = () => {
     });
 
     // Ruta para obtener las facturas finalizadas (pagadas)
-    router.get('/find/finalized', async (req, res) => {
+    router.get('/findFinalized', async (req, res) => {
         try {
             const invoices = await invoiceRepository.find({
                 where: { is_payment_confirmed: true, is_deleted: false }, // Facturas pagadas
