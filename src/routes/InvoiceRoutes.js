@@ -73,6 +73,23 @@ export const InvoiceRoutes = () => {
         }
     })
 
+    router.get("/findByUser/:id", async (req, res) => {
+        const { id } = req.params;
+        const invoices = await invoiceRepository.find({
+            where: {
+                client: { id },  // Filtra el cliente por el ID del usuario
+                is_deleted: false
+            },
+            relations: ["invoice_detail", "invoice_detail.product"]  // Incluye la relación de producto en cada detalle de factura
+        });
+
+        if (invoices.length > 0) {
+            res.json(invoices);
+        } else {
+            res.status(404).json({ error: "Invoice not found" });
+        }
+    });
+
     router.put("/update/:id", async (req, res) => {
         const { id } = req.params;
         await invoiceRepository.update(id, req.body);
