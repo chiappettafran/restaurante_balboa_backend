@@ -6,12 +6,19 @@ import { upload } from "../index.js";
 import { addRemoveStock } from "../utilities/ProductFunctions.js";
 import { registerTransaction } from "../utilities/TransactionFunctions.js";
 
+// const express = require('express');
+// const router = express.Router();
+// const invoiceController = require('../controllers/invoiceController');
+//
+// router.get('/find/pending', invoiceController.getPendingInvoices);
+
+// module.exports = router;
+
 export const InvoiceRoutes = () => {
     const router = Router();
     const invoiceRepository = AppDataSource.getRepository(Invoice);
     const invoiceDetailRepository = AppDataSource.getRepository(Invoice_Detail);
 
-    // Ruta para crear una nueva factura
     router.post("/create", upload.single('file'), async (req, res) => {
         const payment_proof_file = req.file;
         try {
@@ -43,15 +50,14 @@ export const InvoiceRoutes = () => {
                 await registerTransaction(invoice.payment_method, "deposit", invoice.total_amount, `a Ventas por ${invoice.payment_method}`, "Venta");
                 await registerTransaction(`sales${invoice.payment_method}`, "withdrawal", -invoice.total_amount, "Venta");
             });
-
             res.status(201).json(invoice);
+
         } catch (e) {
             console.error(e);
             res.status(500).json({ error: 'Error al crear la factura' });
         }
     });
 
-    // Ruta para obtener todas las facturas
     router.get("/find/all", async (req, res) => {
         const invoices = await invoiceRepository.find({
             where: { is_deleted: false },
@@ -60,7 +66,6 @@ export const InvoiceRoutes = () => {
         res.json(invoices);
     });
 
-    // Ruta para obtener una factura por ID
     router.get("/find/:id", async (req, res) => {
         const { id } = req.params;
         const invoice = await invoiceRepository.findOne({
@@ -74,7 +79,6 @@ export const InvoiceRoutes = () => {
         }
     });
 
-    // Ruta para actualizar una factura
     router.put("/update/:id", async (req, res) => {
         const { id } = req.params;
         await invoiceRepository.update(id, req.body);
@@ -85,13 +89,11 @@ export const InvoiceRoutes = () => {
         res.json(updatedInvoice);
     });
 
-    // Ruta para eliminar (soft delete) una factura
     router.patch("/delete/:id", async (req, res) => {
         const { id } = req.params;
         const result = await invoiceRepository.update(id, { is_deleted: true });
 
         if (result.affected) {
-            const invoiceDetailRepository = AppDataSource.getRepository(Invoice_Detail);
             await invoiceDetailRepository.update({ invoice: { id } }, { is_deleted: true });
             res.status(204).send('soft deleted invoice');
         } else {
@@ -99,23 +101,35 @@ export const InvoiceRoutes = () => {
         }
     });
 
-    // Ruta para obtener las ventas pendientes
-    router.get("/pendingSales", async (req, res) => {
+// src/routes/InvoiceRoutes.js
+    router.get("/find/pending", async (req, res) => {
         try {
-            // Filtrar las facturas con estado "is_payment_confirmed" como false (o el campo correspondiente)
-            const pendingSales = await AppDataSource.getRepository(Invoice)
-                .find({
-                    where: { is_payment_confirmed: false, is_deleted: false }, // Asegúrate de que este filtro coincida con tu esquema
-                    relations: ["invoice_detail", "user"], // Incluye las relaciones necesarias
-                });
-
-            // Devolver las ventas pendientes
-            res.json(pendingSales);
-        } catch (err) {
-            console.error("Error al obtener las ventas pendientes", err);
-            res.status(500).json({ error: "Error al obtener las ventas pendientes" });
+            const pendingInvoices = await invoiceRepository.find({
+                where: {
+                    is_deleted: false,
+                    is_payment_confirmed: false, // Solo facturas no confirmadas
+                },
+                relations: ["User"],
+            });
+            res.json(pendingInvoices);
+        } catch (error) {
+            console.log("Error al obtener las facturas pendientes:", error);
+            res.status(500).json({ error: "Error al obtener las facturas pendientes" });
         }
     });
+    // En InvoiceRoutes.js o similar en el backend
+    router.get('/find/finalized', async (req, res) => {
+        try {
+            const invoices = await invoiceRepository.find({
+                where: { is_payment_confirmed: true, is_deleted: false }, // Asumiendo que 'finalizado' es cuando la factura está pagada
+            });
+            res.json(invoices);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al obtener facturas finalizadas');
+        }
+    });
+
 
     return router;
 };
